@@ -114,26 +114,33 @@ pub trait Render {
     }
 }
 
-impl<T: Render> Render for Option<T> {
+trait OptionRender {}
+
+impl<T: OptionRender + Render> Render for Option<T> {
     fn render_to(&self, w: &mut String) {
-        if let Some(s) = self {
-            s.render_to(w);
+        if let Some(inner) = self {
+            T::render_to(inner, w);
         }
     }
 }
 
+impl<T> OptionRender for PreEscaped<T> {}
+
+impl OptionRender for str {}
 impl Render for str {
     fn render_to(&self, w: &mut String) {
         escape::escape_to_string(self, w);
     }
 }
 
+impl OptionRender for String {}
 impl Render for String {
     fn render_to(&self, w: &mut String) {
         str::render_to(self, w);
     }
 }
 
+impl OptionRender for Cow<'_, str> {}
 impl Render for Cow<'_, str> {
     fn render_to(&self, w: &mut String) {
         str::render_to(self, w);
@@ -146,18 +153,21 @@ impl Render for Arguments<'_> {
     }
 }
 
+impl<T: Render + ?Sized> OptionRender for &T {}
 impl<T: Render + ?Sized> Render for &T {
     fn render_to(&self, w: &mut String) {
         T::render_to(self, w);
     }
 }
 
+impl<T: Render + ?Sized> OptionRender for &mut T {}
 impl<T: Render + ?Sized> Render for &mut T {
     fn render_to(&self, w: &mut String) {
         T::render_to(self, w);
     }
 }
 
+impl<T: Render + ?Sized> OptionRender for Box<T> {}
 impl<T: Render + ?Sized> Render for Box<T> {
     fn render_to(&self, w: &mut String) {
         T::render_to(self, w);

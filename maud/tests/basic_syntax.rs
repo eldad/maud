@@ -120,6 +120,11 @@ fn optional_attribute_some() {
 
 #[test]
 fn optional_element() {
+    let x = Some("optional element");
+    let result = html! { div { (x) } };
+    assert_eq!(result.into_string(), "<div>optional element</div>");
+
+    // preescaped
     let x = Some(html! { "optional element" });
     let result = html! { div { (x) } };
     assert_eq!(result.into_string(), "<div>optional element</div>");
@@ -128,9 +133,10 @@ fn optional_element() {
     let result = html! { div { (y) } };
     assert_eq!(result.into_string(), "<div></div>");
 
-    let nested = Some(Some(html! { "optional element" }));
-    let result = html! { div { (nested) } };
-    assert_eq!(result.into_string(), "<div>optional element</div>");
+    // Nesting is not allowed: Option<Option<T>> does not compile
+    // let nested = Some(Some(html! { "optional element" }));
+    // let result = html! { div { (nested) } };
+    // assert_eq!(result.into_string(), "<div>optional element</div>");
 }
 
 #[test]
