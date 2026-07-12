@@ -114,6 +114,14 @@ pub trait Render {
     }
 }
 
+impl<T: Render> Render for Option<T> {
+    fn render_to(&self, w: &mut String) {
+        if let Some(s) = self {
+            s.render_to(w);
+        }
+    }
+}
+
 impl Render for str {
     fn render_to(&self, w: &mut String) {
         escape::escape_to_string(self, w);
